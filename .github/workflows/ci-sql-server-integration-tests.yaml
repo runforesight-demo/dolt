@@ -6,6 +6,10 @@ on:
     paths:
       - 'go/**'
       - 'integration-tests/go-sql-server-driver/**'
+      
+env:
+  FORESIGHT_UPLOADER_SIGNER_URL: https://upload.service.runforesight.us
+  WORKFLOW_TELEMETRY_BASE_URL: https://api.service.runforesight.us
 
 concurrency:
   group: ci-sql-server-integration-tests-${{ github.event.pull_request.number || github.ref }}
@@ -29,6 +33,11 @@ jobs:
           - os: "windows-latest"
             dolt_fmt: ["__LD_1__" ]
     steps:
+      - name: Collect Workflow Telemetry
+        if: always()
+        uses: runforesight/foresight-workflow-kit-action@v1
+        with:
+          api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
       - name: Setup Go 1.x
         uses: actions/setup-go@v3
         with:
@@ -48,5 +57,16 @@ jobs:
         run: |
           if [ -n "$DOLT_FMT" ]; then export DOLT_DEFAULT_BIN_FORMAT="$DOLT_FMT"; fi
           export DOLT_BIN_PATH="$(pwd)/../../.ci_bin/dolt"
-          go test .
+          go test -v -json . > ./test-report.json -coverprofile=coverage.out
         working-directory: ./integration-tests/go-sql-server-driver
+      - name: Analyze Test and/or Coverage Results
+        if: always()
+        uses: runforesight/foresight-test-kit-action@v1
+        with:
+          api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
+          test_framework: golang
+          test_format: json
+          test_path: ./test-report.json
+          coverage_format: golang
+          coverage_path: |
+              coverage.out
