@@ -6,7 +6,11 @@ on:
     paths:
       - 'go/**'
   workflow_dispatch:
-
+  
+env:
+  FORESIGHT_UPLOADER_SIGNER_URL: https://upload.service.runforesight.us
+  WORKFLOW_TELEMETRY_BASE_URL: https://api.service.runforesight.us
+  
 concurrency:
   group: ci-go-tests-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -27,6 +31,11 @@ jobs:
           - os: "ubuntu-22.04"
             dolt_fmt: "__DOLT_DEV__"
     steps:
+    - name: Collect Workflow Telemetry
+      if: always()
+      uses: runforesight/foresight-workflow-kit-action@v1
+      with:
+        api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
     - name: Set up Go 1.x
       uses: actions/setup-go@v3
       with:
@@ -48,12 +57,12 @@ jobs:
           if [ "$MATRIX_OS" == 'ubuntu-22.04' ]
           then
             if [[ "${file_arr[$i]}" != *enginetest* ]]; then
-              go test -timeout 45m -race "${file_arr[$i]}"
+              go test -v -json -timeout 45m -race "${file_arr[$i]}" > ./reports/test-report-${file_arr[$i]}.json -coverprofile=coverage.out
             else
               echo "skipping enginetests for -race"
             fi
           else
-            go test -timeout 45m "${file_arr[$i]}"
+            go test -v -json -timeout 45m "${file_arr[$i]}" > ./reports/test-report-${file_arr[$i]}.json -coverprofile=coverage.out
           fi
           succeeded=$(echo "$?")
           if [ "$succeeded" -ne 0 ]; then
@@ -64,6 +73,17 @@ jobs:
       env:
         MATRIX_OS: ${{ matrix.os }}
         DOLT_DEFAULT_BIN_FORMAT: ${{ matrix.dolt_fmt }}
+    - name: Analyze Test and/or Coverage Results
+      if: always()
+      uses: runforesight/foresight-test-kit-action@v1
+      with:
+        api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
+        test_framework: golang
+        test_format: json
+        test_path: ./reports/**
+        coverage_format: golang
+        coverage_path: |
+            coverage.out
   noracetest:
     name: Go tests - no race
     defaults:
@@ -79,6 +99,11 @@ jobs:
           - os: "ubuntu-22.04"
             dolt_fmt: "__DOLT_DEV__"
     steps:
+    - name: Collect Workflow Telemetry
+      if: always()
+      uses: runforesight/foresight-workflow-kit-action@v1
+      with:
+        api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
     - name: Set up Go 1.x
       uses: actions/setup-go@v3
       with:
@@ -89,9 +114,20 @@ jobs:
       working-directory: ./go
       run: |
         if [ -n "$DOLT_FMT" ]; then export DOLT_DEFAULT_BIN_FORMAT="$DOLT_FMT"; fi
-        go test -timeout 30m ./libraries/doltcore/sqle/altertests
-        go test -timeout 30m ./libraries/doltcore/sqle/integration_test
+        go test -v -json -timeout 30m ./libraries/doltcore/sqle/altertests > ./reports/test-report-altertests.json -coverprofile=coverage.out
+        go test -v -json -timeout 30m ./libraries/doltcore/sqle/integration_test > ./reports/test-report-integration.json -coverprofile=coverage.out
       env:
         DOLT_FMT: ${{ matrix.dolt_fmt }}
         MATRIX_OS: ${{ matrix.os }}
         DOLT_TEST_RUN_NON_RACE_TESTS: "true"
+    - name: Analyze Test and/or Coverage Results
+      if: always()
+      uses: runforesight/foresight-test-kit-action@v1
+      with:
+        api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
+        test_framework: golang
+        test_format: json
+        test_path: ./reports/**
+        coverage_format: golang
+        coverage_path: |
+            coverage.out
