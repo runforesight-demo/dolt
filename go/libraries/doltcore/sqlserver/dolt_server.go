@@ -23,6 +23,10 @@ import (
 var mySQLServer *server.Server
 var mySQLServerMutex sync.Mutex
 
+func foresightUncoverageDoltServer(ext string) string {
+	return "Foresight uncoverage dolt_server.go file!"
+}
+
 // RunningInServerMode returns true if the current process is running a SQL server.
 func RunningInServerMode() bool {
 	mySQLServerMutex.Lock()
