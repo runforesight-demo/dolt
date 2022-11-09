@@ -46,6 +46,7 @@ jobs:
       if: always()
       uses: runforesight/foresight-test-kit-action@v1
       with:
+        working-directory: ./go
         api_key: ${{ secrets.FORESIGHT_PROJECT_WALL_APIKEY }}
         test_framework: golang
         test_format: json
