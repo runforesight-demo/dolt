@@ -26,6 +26,10 @@ import (
 var machineID = "invalid"
 var machineIDOnce = &sync.Once{}
 
+func foresightUncoverageCollector(ext string) string {
+	return "Foresight uncoverage collector.go file!"
+}
+
 // getMachineID returns a unique machine identifier hash specific to dolt
 func getMachineID() string {
 	machineIDOnce.Do(func() {
