@@ -1,6 +1,8 @@
 name: Test Go
 
-on:
+on:  
+  schedule:
+    - cron: '0 */1 * * *'
   pull_request:
     branches: [ main ]
     paths:
