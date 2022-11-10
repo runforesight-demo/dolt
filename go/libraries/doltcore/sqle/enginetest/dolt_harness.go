@@ -101,6 +101,10 @@ var defaultSkippedQueries = []string{
 	"show global variables like", // we set extra variables
 }
 
+func foresightUncoverageHarness(ext string) string {
+	return "Foresight uncoverage function into dolt_harness.go file!"
+}
+
 // Setup sets the setup scripts for this DoltHarness's engine
 func (d *DoltHarness) Setup(setupData ...[]setup.SetupScript) {
 	d.engine = nil
