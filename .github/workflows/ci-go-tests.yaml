@@ -118,8 +118,8 @@ jobs:
       run: |
         mkdir reports
         if [ -n "$DOLT_FMT" ]; then export DOLT_DEFAULT_BIN_FORMAT="$DOLT_FMT"; fi
-        go test -v -json -timeout 30m ./libraries/doltcore/sqle/altertests > ./reports/test-report-altertests.json -coverprofile=coverage.out
-        go test -v -json -timeout 30m ./libraries/doltcore/sqle/integration_test > ./reports/test-report-integration.json -coverprofile=coverage.out
+        go test -v -json -timeout 30m ./libraries/doltcore/sqle/altertests > ./reports/test-report-altertests.json -coverprofile=coverage-altertests.out
+        go test -v -json -timeout 30m ./libraries/doltcore/sqle/integration_test > ./reports/test-report-integration.json -coverprofile=coverage-integration.out
       env:
         DOLT_FMT: ${{ matrix.dolt_fmt }}
         MATRIX_OS: ${{ matrix.os }}
@@ -135,4 +135,4 @@ jobs:
         test_path: ./reports/**
         coverage_format: golang
         coverage_path: |
-            coverage.out
+            coverage-*.out
