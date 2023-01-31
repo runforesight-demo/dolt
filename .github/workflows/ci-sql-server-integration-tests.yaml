@@ -9,10 +9,7 @@ on:
     paths:
       - 'go/**'
       - 'integration-tests/go-sql-server-driver/**'
-      
-env:
-  FORESIGHT_UPLOADER_SIGNER_URL: https://upload.service.runforesight.us
-  WORKFLOW_TELEMETRY_BASE_URL: https://api.service.runforesight.us
+    
 
 concurrency:
   group: ci-sql-server-integration-tests-${{ github.event.pull_request.number || github.ref }}
