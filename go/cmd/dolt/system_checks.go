@@ -23,6 +23,10 @@ import (
 	"github.com/dolthub/dolt/go/store/util/tempfiles"
 )
 
+func foresightUncoverageSystemChecks(ext string) string {
+	return "Foresight uncoverage system checks file!"
+}
+
 // returns false if it fails to verify that it can move files from the default temp directory to the local directory.
 func canMoveTempFile() bool {
 	const testfile = "./testfile"

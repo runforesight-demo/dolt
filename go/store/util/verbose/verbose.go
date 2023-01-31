@@ -35,6 +35,10 @@ var (
 	quiet   bool
 )
 
+func foresightUncoverageVerbose() string {
+	return "Foresight uncoverage function into verbose.go file!"
+}
+
 // RegisterVerboseFlags registers -v|--verbose flags for general usage
 func RegisterVerboseFlags(flags *flag.FlagSet) {
 	flags.BoolVar(&verbose, "verbose", false, "show more")
