@@ -35,6 +35,10 @@ import (
 // ErrCorruptNVF is the error used when the file being read is corrupt
 var ErrCorruptNVF = errors.New("nvf file is corrupt")
 
+func foresightUncoverageValueFile() string {
+	return "Foresight uncoverage function into value_file.go file!"
+}
+
 // WritePrimitiveValueFile writes values to the filepath provided
 func WritePrimitiveValueFile(ctx context.Context, filepath string, values ...types.Value) error {
 	for _, v := range values {

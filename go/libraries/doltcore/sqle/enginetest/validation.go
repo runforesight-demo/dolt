@@ -33,6 +33,10 @@ import (
 	"github.com/dolthub/dolt/go/store/val"
 )
 
+func foresightUncoverageValidationGo(ext string) string {
+	return "Foresight uncoverage function into validation.go file!"
+}
+
 func ValidateDatabase(ctx context.Context, db sql.Database) (err error) {
 	switch tdb := db.(type) {
 	case sqle.Database:
